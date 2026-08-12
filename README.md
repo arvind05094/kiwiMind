@@ -2,11 +2,9 @@
 
 **Chat with your documents.** Upload your files, then ask questions in plain English and get answers drawn straight from *your* content — with citations pointing back to the exact source.
 
-### 🔗 [Try the live demo →](https://icy-ocean-0d8e91200.7.azurestaticapps.net/knowledge-bases)
+### 🔗 Live demo — available on request
 
-> **Note on the live demo:** to avoid ongoing cloud costs for a portfolio project, the hosted demo is spun up on request rather than left running 24/7 — so the link above may be offline at any given moment. The entire stack is defined as infrastructure-as-code and redeploys in ~15 minutes. **Happy to bring it online for a live walkthrough — just reach out.** Meanwhile, the screenshots below and the code in this repo show exactly what it does.
->
-> When it *is* running, it uses free/low-cost tiers that "sleep" when idle, so the **first action after a quiet period takes ~10 seconds** to wake up (you'll see a "waking up" message). Everything is snappy after that.
+> To avoid ongoing cloud costs for a portfolio project, the hosted demo isn't left running 24/7. The entire stack is defined as infrastructure-as-code and redeploys in ~15 minutes, so I spin it up on request — **happy to bring it online for a live walkthrough, just reach out.** Meanwhile, the screenshots below and the code in this repo show exactly what it does.
 
 ![Chat with grounded answers and citations](docs/chat.png)
 
