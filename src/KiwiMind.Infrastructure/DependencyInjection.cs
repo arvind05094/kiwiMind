@@ -27,8 +27,8 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<ITokenService, TokenService>();
 
-        services.Configure<BlobStorageSettings>(options => configuration.GetSection(BlobStorageSettings.SectionName).Bind(options));
-        services.AddSingleton<IBlobStorageService, BlobStorageService>();
+        services.Configure<S3StorageSettings>(options => configuration.GetSection(S3StorageSettings.SectionName).Bind(options));
+        services.AddSingleton<IBlobStorageService, S3BlobStorageService>();
 
         services.AddSingleton<IDocumentIngestionQueue, DocumentIngestionQueue>();
         services.AddSingleton<ITextChunker, TextChunker>();

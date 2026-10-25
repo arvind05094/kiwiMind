@@ -1,49 +1,63 @@
-using Azure.Storage.Blobs;
+using Amazon.S3;
+using Amazon.S3.Model;
 using KiwiMind.Application.Common.Interfaces;
 using KiwiMind.Application.Common.Settings;
 using Microsoft.Extensions.Options;
 
 namespace KiwiMind.Infrastructure.Storage;
 
-public class BlobStorageService : IBlobStorageService
+public class S3BlobStorageService : IBlobStorageService
 {
-    private readonly BlobContainerClient _containerClient;
+    private readonly IAmazonS3 _s3Client;
+    private readonly string _bucketName;
 
-    public BlobStorageService(IOptions<BlobStorageSettings> settings)
+    public S3BlobStorageService(IOptions<S3StorageSettings> settings)
     {
-        var serviceClient = new BlobServiceClient(settings.Value.ConnectionString);
-        _containerClient = serviceClient.GetBlobContainerClient(settings.Value.ContainerName);
+        var config = new AmazonS3Config
+        {
+            ServiceURL = settings.Value.ServiceUrl,
+            ForcePathStyle = true
+        };
+        _s3Client = new AmazonS3Client(
+            settings.Value.AccessKey,
+            settings.Value.SecretKey,
+            config);
+        _bucketName = settings.Value.BucketName;
     }
 
     public async Task<string> UploadAsync(Stream content, string blobName, string contentType, CancellationToken cancellationToken)
     {
-        await _containerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
-
-        var blobClient = _containerClient.GetBlobClient(blobName);
-        await blobClient.UploadAsync(
-            content,
-            new Azure.Storage.Blobs.Models.BlobHttpHeaders { ContentType = contentType },
-            cancellationToken: cancellationToken);
-
-        return blobClient.Uri.ToString();
+        var request = new PutObjectRequest
+        {
+            BucketName = _bucketName,
+            Key = blobName,
+            InputStream = content,
+            ContentType = contentType
+        };
+        await _s3Client.PutObjectAsync(request, cancellationToken);
+        return $"{_bucketName}/{blobName}";
     }
 
     public async Task DeleteAsync(string blobUri, CancellationToken cancellationToken)
     {
-        var blobClient = _containerClient.GetBlobClient(GetBlobNameFromUri(blobUri));
-        await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+        var key = ExtractKey(blobUri);
+        await _s3Client.DeleteObjectAsync(_bucketName, key, cancellationToken);
     }
 
     public async Task<Stream> OpenReadAsync(string blobUri, CancellationToken cancellationToken)
     {
-        var blobClient = _containerClient.GetBlobClient(GetBlobNameFromUri(blobUri));
-        return await blobClient.OpenReadAsync(cancellationToken: cancellationToken);
+        var key = ExtractKey(blobUri);
+        var response = await _s3Client.GetObjectAsync(_bucketName, key, cancellationToken);
+        return response.ResponseStream;
     }
 
-    // BlobUriBuilder correctly extracts the blob name from both host-style
-    // Azure URLs (account in the hostname) and path-style emulator URLs
-    // (account as a path segment, e.g. Azurite). A hand-rolled segment split
-    // silently drops the knowledge-base folder on one of the two layouts.
-    private static string GetBlobNameFromUri(string blobUri) =>
-        new BlobUriBuilder(new Uri(blobUri)).BlobName;
+    private static string ExtractKey(string blobUri)
+    {
+        // Handle both "bucket/key" format and full URIs
+        if (Uri.TryCreate(blobUri, UriKind.Absolute, out var uri) && uri.Scheme.StartsWith("http"))
+            return uri.AbsolutePath.TrimStart('/').Split('/', 2).Last();
+        // Simple "bucket/key" format
+        var slashIndex = blobUri.IndexOf('/');
+        return slashIndex >= 0 ? blobUri[(slashIndex + 1)..] : blobUri;
+    }
 }
