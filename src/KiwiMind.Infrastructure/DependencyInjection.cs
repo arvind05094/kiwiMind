@@ -34,12 +34,20 @@ public static class DependencyInjection
         services.AddSingleton<ITextChunker, TextChunker>();
         services.AddSingleton<IDocumentTextExtractor, DocumentTextExtractor>();
 
+        services.Configure<GroqSettings>(options => configuration.GetSection(GroqSettings.SectionName).Bind(options));
+        var groqApiKey = configuration.GetSection(GroqSettings.SectionName).Get<GroqSettings>()?.ApiKey;
+
         services.Configure<AzureOpenAiSettings>(options => configuration.GetSection(AzureOpenAiSettings.SectionName).Bind(options));
         var azureOpenAiEnabled = configuration.GetSection(AzureOpenAiSettings.SectionName).Get<AzureOpenAiSettings>()?.Enabled ?? false;
         if (azureOpenAiEnabled)
         {
             services.AddSingleton<IEmbeddingService, AzureOpenAiEmbeddingService>();
             services.AddSingleton<IChatCompletionService, AzureOpenAiChatCompletionService>();
+        }
+        else if (!string.IsNullOrWhiteSpace(groqApiKey))
+        {
+            services.AddSingleton<IEmbeddingService, FakeEmbeddingService>();
+            services.AddSingleton<IChatCompletionService, GroqChatCompletionService>();
         }
         else
         {
