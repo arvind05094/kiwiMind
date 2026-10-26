@@ -1,176 +1,151 @@
 # KiwiMind
 
-**Chat with your documents.** Upload your files, then ask questions in plain English and get answers drawn straight from *your* content — with citations pointing back to the exact source.
+**Chat with your documents.** Upload your files, ask questions in plain English, and get streaming answers drawn straight from *your* content — with interactive citations pointing back to the exact source.
 
-### 🔗 Live demo — available on request
+[![Live Demo](https://img.shields.io/badge/Demo-Live%20on%20Cloudflare-blue?style=for-the-badge&logo=cloudflare)](https://kiwimind-6d1.pages.dev/knowledge-bases)
+[![GitHub](https://img.shields.io/badge/Source-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/arvind05094/kiwiMind)
+[![LinkedIn](https://img.shields.io/badge/Connect-LinkedIn-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/arvind-chauhan-dev/)
 
-> To avoid ongoing cloud costs for a portfolio project, the hosted demo isn't left running 24/7. The entire stack is defined as infrastructure-as-code and redeploys in ~15 minutes, so I spin it up on request — **happy to bring it online for a live walkthrough, just reach out.** Meanwhile, the screenshots below and the code in this repo show exactly what it does.
+---
+
+### 🌐 [Click here for Live Demo](https://kiwimind-6d1.pages.dev/knowledge-bases)
+
+> 💡 **Try it in 60 seconds (No verification needed):**
+> 1. Open the [live demo](https://kiwimind-6d1.pages.dev/knowledge-bases) and register with any email + password.
+> 2. Create a **Knowledge Base** (e.g., *"Product Docs"* or *"Research"*).
+> 3. Upload a document (PDF, DOCX, TXT, or Markdown).
+> 4. Switch to the **Conversations** tab, click **+ New**, and ask any question about your document!
 
 ![Chat with grounded answers and citations](docs/chat.png)
 
-*Ask questions in plain English and get answers grounded in your documents — every response links back to its source (`taj-mahal.txt`), and follow-up questions keep the conversation's context.*
+*Ask questions in natural language and get answers grounded in your documents — every response links back to its source, and follow-up questions maintain full context.*
 
 |  |  |
 |---|---|
 | ![Knowledge bases](docs/home-page.png) | ![Inside a knowledge base](docs/knowledge-base.png) |
-| *Your knowledge bases — collections of documents* | *Inside a knowledge base — uploads with live processing status* |
+| *Your knowledge bases — scoped document collections* | *Inside a knowledge base — uploads with live status* |
 
 ---
 
-## What is this?
+## What is KiwiMind?
 
-Imagine you have a stack of documents — a contract, a research paper, a policy handbook — and you want answers without reading all of it. KiwiMind lets you:
+Imagine having a stack of lengthy documents — technical manuals, contracts, policy guides, or research papers — and needing immediate answers without reading through hundreds of pages. 
 
-1. **Upload** your documents (PDF, Word, or text).
-2. **Ask** questions in natural language, like *"What year was this signed and by whom?"*
-3. **Get answers** written from your documents, with little **citation chips** you can click to see exactly where each fact came from.
+KiwiMind is a full-stack **RAG (Retrieval-Augmented Generation)** platform built from scratch to show modern AI engineering end-to-end:
+1. **Upload** documents (PDF, Word, or plain text).
+2. **Ask** questions naturally (e.g., *"What is the warranty period and who signed the contract?"*).
+3. **Get streaming, cited answers** backed by **citation chips** linking back to the exact passage in your document.
 
-It's the same idea behind "chat with a PDF" tools and AI copilots — built from scratch to show how that technology actually works end to end.
-
-**Why it matters:** instead of the AI making things up, every answer is *grounded* in your uploaded content. This technique is called **RAG (Retrieval-Augmented Generation)**, and it's how modern AI assistants stay accurate and trustworthy.
-
-### Try it in 60 seconds
-1. Open the [live demo](https://icy-ocean-0d8e91200.7.azurestaticapps.net/knowledge-bases) and register (any email + password — it's a demo, no verification).
-2. Create a **knowledge base** (a named collection, e.g. "My Docs").
-3. **Upload** a document (a short PDF or `.txt` works great).
-4. Start a **conversation** and ask it something. Watch the answer stream in with citations.
+**Why RAG matters:** Instead of the AI hallucinating facts, every answer is strictly *grounded* in the uploaded source text.
 
 ---
 
-## What it does (features)
+## Key Features
 
-- 🔐 **Secure, multi-tenant** — everyone's documents are private to their own account.
-- 📚 **Knowledge bases** — organise documents into named collections to scope what the assistant searches.
-- 📄 **Document ingestion** — upload PDF / DOCX / TXT / MD; the app extracts the text, splits it into passages, and indexes them for search (all in the background, with live status).
-- 💬 **Grounded answers with citations** — every answer cites the source passage it came from.
-- 🤖 **Agentic assistant** — an AI agent that can call multiple tools (search, summarise a document, compare two documents, list what's in a knowledge base) to handle questions a single lookup can't.
-- ⚡ **Streaming responses** — answers appear word-by-word in real time.
-- 🗂 **Persistent conversations** — chat history is saved per knowledge base.
-
----
-
-## How it works
-
-KiwiMind is a **RAG pipeline**. Two flows do the work:
-
-**Ingesting a document (background):**
-
-```mermaid
-flowchart LR
-    A[Upload file] --> B[Store in Blob Storage]
-    B --> C[Extract text]
-    C --> D[Split into chunks]
-    D --> E[Create embeddings]
-    E --> F[(Store vectors in Postgres/pgvector)]
-```
-
-**Answering a question:**
-
-```mermaid
-flowchart LR
-    Q[Your question] --> E2[Embed the question]
-    E2 --> S[Find the most similar passages<br/>vector search]
-    S --> A[AI agent writes an answer<br/>using only those passages]
-    A --> C[Return answer + citations]
-```
-
-In short: text is turned into **embeddings** (lists of numbers that capture meaning) and stored in a **vector database**. When you ask something, your question is embedded too, the most similar passages are retrieved, and the language model is instructed to answer **only** from those passages — then cite them.
+- 🔐 **Multi-Tenant Security** — Documents and conversations are strictly isolated per user account.
+- 📚 **Scoped Knowledge Bases** — Organize files into distinct domains so the agent only searches relevant content.
+- 📄 **Background Document Ingestion** — Automatic PDF/DOCX/TXT text extraction, intelligent chunking, and vector embedding.
+- 💬 **Grounded Answers with Citations** — Inline source tags `[1]`, `[2]` showing the exact file and excerpt.
+- 🤖 **Agentic Capabilities** — Semantic Kernel agent supporting multi-tool reasoning (search, summarize document, compare documents, view metadata).
+- ⚡ **Real-time SignalR Streaming** — Responses stream token-by-token in real time.
+- 🛡️ **Zero-Downtime Graceful Fallback** — Built-in resilience that automatically falls back to grounded document excerpts if third-party AI rate limits are reached.
 
 ---
 
-## Tech stack
-
-| Area | Technology |
-|---|---|
-| **Backend** | .NET 10, ASP.NET Core Web API, Clean Architecture + CQRS (MediatR), EF Core (Npgsql) |
-| **AI** | Semantic Kernel agent with tool-calling · Azure OpenAI (`gpt-5-mini` for chat, `text-embedding-3-small` for embeddings) |
-| **Vector store** | PostgreSQL + `pgvector` (HNSW index, cosine similarity) |
-| **Real-time** | SignalR (token streaming) |
-| **Frontend** | React 19, TypeScript, Vite, TanStack Query, Tailwind CSS v4, shadcn/ui |
-| **Auth** | JWT access/refresh tokens, multi-tenant isolation |
-| **Cloud** | Azure Container Apps (API), Azure Static Web Apps (frontend), Blob Storage, PostgreSQL Flexible Server |
-| **Infrastructure as Code** | Bicep |
-| **CI/CD** | GitHub Actions (build → test → deploy) |
-| **Observability** | OpenTelemetry → Azure Application Insights |
-| **Testing** | xUnit, Testcontainers, and a RAG evaluation harness (groundedness scoring) |
-
----
-
-## Architecture
+## Architecture & Data Flow
 
 ```mermaid
 flowchart TD
-    User([User]) --> SWA[React frontend<br/>Azure Static Web Apps]
-    SWA -->|REST + SignalR| API[.NET API<br/>Azure Container Apps]
-    API --> PG[(PostgreSQL + pgvector)]
-    API --> Blob[(Blob Storage)]
-    API --> AOAI[Azure OpenAI<br/>chat + embeddings]
-    API --> AI[Application Insights]
+    User([User Browser]) --> SWA[Cloudflare Pages<br/>React 19 + Vite SPA]
+    SWA -->|REST + SignalR| API[.NET 10 API<br/>Render Docker Web Service]
+    API --> PG[(Neon Serverless Postgres<br/>pgvector Vector Store)]
+    API --> S3[(Supabase Storage<br/>S3-Compatible Blob Store)]
+    API --> LLM[Groq Cloud<br/>Llama 3.3 / GPT-OSS 120B]
 ```
 
-The backend follows **Clean Architecture** — the domain and application logic don't depend on any infrastructure. **The live demo runs on real Azure OpenAI** (`gpt-5-mini` for chat, `text-embedding-3-small` for embeddings). Because those providers sit behind interfaces (`IEmbeddingService`, `IChatCompletionService`), the same code also has deterministic **fake** implementations that kick in when no Azure OpenAI config is present — so anyone can run the entire pipeline locally with **zero AI cost or API keys**, and Azure OpenAI could be swapped for a local model without touching business logic.
+### Ingestion Flow (Background)
+```mermaid
+flowchart LR
+    A[Upload File] --> B[Store in S3 Storage]
+    B --> C[Extract Text]
+    C --> D[Split into Chunks]
+    D --> E[Generate Embeddings]
+    E --> F[(Store Vectors in Neon pgvector)]
+```
+
+### Retrieval & Answer Flow
+```mermaid
+flowchart LR
+    Q[User Question] --> V[Generate Query Vector]
+    V --> S[Cosine Similarity Search<br/>pgvector HNSW index]
+    S --> A[LLM Agent Grounding<br/>Groq High-Speed Inference]
+    A --> C[Stream Answer + Citations<br/>SignalR]
+```
 
 ---
 
-## Engineering highlights
+## Tech Stack
 
-A few things worth calling out for a technical review:
-
-- **Provider-agnostic AI** — real Azure OpenAI and offline fake implementations sit behind the same interfaces, toggled by config. Local development needs no cloud credentials.
-- **Native vector search** — embeddings are stored as `pgvector` columns so cosine similarity runs in SQL (with an HNSW index), not in application memory.
-- **Agentic tool-calling** — a Semantic Kernel agent chooses among tools (`search_knowledge_base`, `summarize_document`, `compare_documents`, `get_document_metadata`, `list_documents`) rather than doing a single fixed retrieval.
-- **RAG evaluation harness** — a Testcontainers-backed test suite scores answer *groundedness* against a golden dataset, catching hallucination regressions.
-- **Resilient ingestion** — background worker with startup reconciliation (in-flight jobs are re-queued after a restart), batched embedding calls, and per-user quotas.
-- **Production concerns** — rate limiting, upload size limits, multi-tenant query filters, managed-identity image pulls, and full request tracing to Application Insights.
+| Layer | Technology |
+|---|---|
+| **Frontend** | React 19, TypeScript, Vite, TanStack Query, Tailwind CSS v4, shadcn/ui |
+| **Backend** | .NET 10, ASP.NET Core Web API, Clean Architecture, CQRS (MediatR), EF Core (Npgsql) |
+| **Database & Vectors** | PostgreSQL 16 + **`pgvector`** on **Neon** (cosine similarity, HNSW index) |
+| **Blob Storage** | **Supabase Storage** (S3-compatible, `AWSSDK.S3`) |
+| **AI & LLM** | **Groq** (GPT-OSS 120B / Llama 3) + Semantic Kernel tool-calling agent |
+| **Real-time** | **ASP.NET Core SignalR** (live token streaming) |
+| **Authentication** | JWT (access & refresh tokens), BCrypt password hashing |
+| **Hosting ($0/mo)** | **Cloudflare Pages** (frontend) + **Render** (containerized API) |
+| **Testing** | xUnit, Testcontainers, RAG evaluation harness |
 
 ---
 
-## Running locally
+## Engineering Highlights
 
-**Prerequisites:** Docker, .NET 10 SDK, Node 22+.
+- **Native Vector Database**: Embeddings are stored natively in PostgreSQL using the `pgvector` extension with vector indexing, executing similarity searches directly in SQL rather than application memory.
+- **Agentic Tool-Calling**: Uses Microsoft Semantic Kernel to choose among specialized tools (`search_knowledge_base`, `summarize_document`, `compare_documents`, `get_document_metadata`, `list_documents`) dynamically.
+- **Clean Architecture & CQRS**: Separation of concerns with Domain, Application, Infrastructure, and API layers using MediatR.
+- **Production Resilience**: Multi-tenant isolation, rate limiting on auth and chat endpoints, file size verification, and graceful fallback to direct citations under high load.
+- **RAG Evaluation Suite**: Includes a Testcontainers-backed evaluation harness to measure and prevent retrieval regression.
 
+---
+
+## Running Locally
+
+### Prerequisites
+- Docker Desktop
+- .NET 10 SDK
+- Node.js 22+
+
+### 1. Start Database & Infrastructure
 ```bash
-# 1. Start Postgres (with pgvector) + Azurite (blob emulator) + the API
-docker compose up --build -d      # API on http://localhost:8080
+docker compose up -d
+```
 
-# 2. Start the frontend
+### 2. Run the Backend API
+```bash
+dotnet run --project src/KiwiMind.Api
+```
+The API starts at `http://localhost:8080`.
+
+### 3. Run the Frontend
+```bash
 cd frontend
 npm install
-npm run dev                       # http://localhost:5173
+npm run dev
 ```
+The application opens at `http://localhost:5173`.
 
-Out of the box it uses the **fake** AI providers — no API keys required — so the full upload → search → chat loop works offline. To use real Azure OpenAI, set the `AzureOpenAI__*` configuration values.
-
-**Run the tests** (includes the Testcontainers-backed RAG evaluation):
-
+### 4. Run the Test Suite
 ```bash
 dotnet test
 ```
 
 ---
 
-## Deployment
+## Author & Contact
 
-Everything is provisioned on Azure with **Bicep** (`infra/`) and deployed by **GitHub Actions** on every push to `main`: build → test → containerise the API → push to Azure Container Registry → update Container Apps, and deploy the frontend to Static Web Apps.
-
-To keep costs near zero, the demo uses free/low tiers, Container Apps **scale-to-zero**, and the smallest Postgres tier.
-
----
-
-## Project structure
-
-```
-src/
-├── KiwiMind.Domain          # Entities, enums — no dependencies
-├── KiwiMind.Application      # CQRS handlers, interfaces (the "what")
-├── KiwiMind.Infrastructure   # EF Core, pgvector, Azure OpenAI, Blob, agent (the "how")
-└── KiwiMind.Api              # Controllers, JWT, SignalR hub, DI
-frontend/                     # React + TypeScript app
-tests/                        # Unit, integration, and RAG-evaluation suites
-infra/                        # Bicep IaC
-.github/workflows/            # CI/CD
-```
-
----
-
-*Built as a portfolio project to demonstrate modern AI engineering (RAG, embeddings, agentic tool-calling) on Azure-native cloud infrastructure.*
+**Arvind Chauhan**
+- **LinkedIn**: [linkedin.com/in/arvind-chauhan-dev](https://www.linkedin.com/in/arvind-chauhan-dev/)
+- **GitHub**: [@arvind05094](https://github.com/arvind05094)
+- **Live Demo**: [kiwimind-6d1.pages.dev](https://kiwimind-6d1.pages.dev/knowledge-bases)
